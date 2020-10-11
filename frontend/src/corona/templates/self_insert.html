@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>식수 인원 조사-수기</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css">
+        <style>
+			#test_btn1{
+				border-top-left-radius: 5px;
+				border-bottom-left-radius: 5px;
+				margin-right:-4px;
+			}
+			#test_btn2{
+				border-top-right-radius: 5px;
+				border-bottom-right-radius: 5px;
+				margin-left:-3px;
+			}
+			#btn_group button{
+				border: 1px solid skyblue;
+				background-color: rgba(0,0,0,0);
+				color: skyblue; padding: 5px;
+			}
+			#btn_group button:hover{
+				color:white;
+				background-color: skyblue;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+            <h1>식수 인원 입력</h1>
+            <div class="links">
+                    <a href="{{ url_for('db_read') }}">QR 코드 입력하기</a>
+                    <a href="{{ url_for('db_create') }}" class="active">직접 입력하기</a>
+            </div>
+            <form action="{{ url_for('db_create') }}" method="post">
+
+                <p>본인 군번 입력하기<br></p>
+                
+                <input type="number" name="count" placeholder="count" id="count" required>
+                <label for="COUNT">
+                    <i class="fas fa-viruses"></i>
+                </label>
+                <input type="submit" value="DB로 정보 보내기">
+                
+            </form>
+            <br>
+			<div id='btn_group'>
+				<button id = 'test_btn1' onclick="location.href='{{ url_for('db_log') }}'">Log</button>
+				<button id = 'test_btn2' onclick="location.href='{{ url_for('db_headcount') }}'">Headcount</button>
+			</div>
+			
+            <div class="msg">{{ msg }}</div>
+        </div>
+        
+    </body>
+</html>

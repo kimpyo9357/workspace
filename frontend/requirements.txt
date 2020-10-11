@@ -1,0 +1,12 @@
+pymysql
+pandas
+uwsgi
+Flask
+flask_sqlalchemy
+mysqlclient
+Flask-Migrate
+flask_script
+
+pyzbar
+opencv-python
+numpy

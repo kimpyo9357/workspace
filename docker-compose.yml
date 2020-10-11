@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  backend:
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_nginx
+    ports:
+      - 8099:5000
+  frontend:
+    restart: always
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_flask
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - 8080
+    environment: 
+      MYSQL_HOST: db
+      MYSQL_DB: corona
+      MYSQL_USER: syru
+      MYSQL_PASS: syru
+
+  db:
+    container_name: db_mysql
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: syru
+      MYSQL_DATABASE: corona
+      MYSQL_USER: syru
+      MYSQL_PASSWORD: syru
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
+      timeout: 20s
+      retries: 10
+    cap_add:
+      - SYS_NICE
