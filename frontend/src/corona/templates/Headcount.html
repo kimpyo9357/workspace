@@ -35,7 +35,12 @@
                     <a href="{{ url_for('db_headcount') }}" class="active">식수 인원 현황</a>
 			</div>
 			<div>
-				<center><input type='date'/><br></center>
+				<center>
+					<form action="{{ url_for('db_headcount') }}" method="post">
+						<input type='date', name="date" placeholder="date" id = "date" required>
+					</form>
+					<br>
+				</center>
 				<table>
 					<th>시간대</th>
 					<th>인원 수</th>

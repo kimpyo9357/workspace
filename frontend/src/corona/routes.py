@@ -53,14 +53,12 @@ def db_log():
         obj.date = obj.date.strftime("%y년 %-m월 %-d일 %H:%M") 
     return render_template("Log.html", data_list=data_list)
 
-@app.route('/Headcount/', methods=['GET'])
+@app.route('/Headcount/', methods=['GET','POST'])
 def db_headcount():
-    data_list = DailyConfirmed.query.all()
-    if not data_list:
-        return redirect(url_for('db_create', msg="데이터가 없습니다. 정보를 입력해주세요"))
-    for obj in data_list:
-        obj.date = obj.date.strftime("%y년 %-m월 %-d일") 
-    return render_template("Headcount.html", data_list=data_list)
+    if request.method == 'GET':
+        return render_template("Headcount.html", msg=request.args.get('msg', ''))
+    date = request.form['date'].split()[0]
+    return redirect(url_for('db_log'))
 
 @app.route('/edit/<date>', methods=['GET'])
 def db_update(date):
