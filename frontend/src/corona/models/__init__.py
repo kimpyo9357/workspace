@@ -7,7 +7,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
-from corona.models import DailyConfirmed
+from corona.models import LogTable
 from corona.models import UploadedFile
+from corona.models import InforTable
 
 db.create_all()

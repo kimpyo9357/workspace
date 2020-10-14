@@ -4,7 +4,7 @@ from flask_sqlalchemy import get_debug_queries
 from corona import app, config
 from corona.models import db
 from corona.models.UploadedFile import UploadedFile
-from corona.models.DailyConfirmed import DailyConfirmed
+from corona.models.LogTable import LogTable
 
 import os
 import csv
@@ -30,30 +30,30 @@ def db_create():
     if request.method == 'GET':
         return render_template("self_insert.html", msg=request.args.get('msg', ''))
     date = request.form['date'].split()[0]
-    today_confirmed = DailyConfirmed(date=request.form['date'], count=request.form['count'])
+    today_confirmed = LogTable(date=request.form['date'], count=request.form['count'])
     db.session.add(today_confirmed)
     db.session.commit()
     return redirect(url_for('db_read'))
 
-@app.route('/QR_insert/', methods=['GET'])
+@app.route('/QR_insert/', methods=['GET','POST'])
 def db_read():
-    data_list = DailyConfirmed.query.all()
-    if not data_list:
-        return redirect(url_for('db_create', msg="데이터가 없습니다. 정보를 입력해주세요"))
-    for obj in data_list:
-        obj.date = obj.date.strftime("%y년 %-m월 %-d일") 
-    return render_template("QR_insert.html", data_list=data_list)
+    if request.method == 'GET':
+        return render_template("QR_insert.html", msg=request.args.get('msg', ''))
+    today_confirmed = LogTable(date=request.form['date'], count=request.form['count'])
+    db.session.add(today_confirmed)
+    db.session.commit()
+    return redirect(url_for('db_read'))
 
 @app.route('/Log/', methods=['GET'])
 def db_log():
-    data_list = DailyConfirmed.query.all()
+    data_list = LogTable.query.all()
     if not data_list:
         return redirect(url_for('db_create', msg="데이터가 없습니다. 정보를 입력해주세요"))
     for obj in data_list:
-        obj.date = obj.date.strftime("%y년 %-m월 %-d일 %H:%M") 
+        obj.date = obj.date.strftime("%y년 %-m월 %-d일 %H:%M")
     return render_template("Log.html", data_list=data_list)
 
-@app.route('/Headcount/', methods=['GET','POST'])
+@app.route('/Headcount/', methods=['GET'])
 def db_headcount():
     if request.method == 'GET':
         return render_template("Headcount.html", msg=request.args.get('msg', ''))
@@ -62,7 +62,7 @@ def db_headcount():
 
 @app.route('/edit/<date>', methods=['GET'])
 def db_update(date):
-    target = DailyConfirmed.query.filter_by(date=date).first()
+    target = LogTable.query.filter_by(date=date).first()
     if not target:
         return redirect(url_for('db_create', msg="해당 날짜의 데이터가 없어 수정이 불가능합니다."))
     target.count = request.args.get('count', target.count)
@@ -71,7 +71,7 @@ def db_update(date):
 
 @app.route('/remove_all_data/', methods=['GET'])
 def db_delete():
-    db.session.query(DailyConfirmed).delete()
+    db.session.query(LogTable).delete()
     db.session.query(UploadedFile).delete()
     db.session.commit()
     shutil.rmtree(app.config['UPLOAD_FOLDER_LOCATION'])
@@ -106,7 +106,7 @@ def upload_file():
     
 @app.route('/export/')
 def export_csv():
-    queryset = DailyConfirmed.query
+    queryset = LogTable.query
     # Pandas가 SQL을 읽도록 만들어주기
     df = pd.read_sql(queryset.statement, queryset.session.bind) 
     output = StringIO()
